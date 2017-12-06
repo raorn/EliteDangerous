@@ -69,7 +69,7 @@ These are your bread and butter when shields pop especially if you're using **Re
 * ~~LEARN TO FLY NOOB!~~
 * ~~If you can't land your ship you shouldn't be doing combat!~~
 * ~~GIT GUD SCRUB!...~~
-Seriously its only worth it if you're a trader and lazy, you're not a trader and there is no place for lazy in combat so don't use it.
+* Seriously its only worth it if you're a trader and lazy, you're not a trader and there is no place for lazy in combat so don't use it.
 
 ### Advanced Discovery Scanner
 You're not an explorer, just drop in on the nav beacon and scan that or buy the system data on the gal map if available should you run into a system where the planets & stations aren't fully revealed yet.
