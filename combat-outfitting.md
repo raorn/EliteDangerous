@@ -6,7 +6,7 @@ These is more of a guide, but I promise some build ideas at the end. Please read
 
 For starters lets begin with our baseline build of the core internals + explanations of the modifications and alternative 'good' modifications to help you make an informed choice in how to ultimately build your ship.
 
-https://eddp.co/u/K6WwQvFf
+<https://eddp.co/u/K6WwQvFf>
 
 ## Core Internals
 * **Reactive Surface Composite** + **G5 Thermal Resistance**: This gives you the same Hull Strength as **Military Grade Composite** but with better resistances, if you're not going to engineer this then buy **Military Grade Composite** since it offers the best all around stock resistances.
@@ -220,12 +220,12 @@ You either want to **D** rate these and then slowly raise them up by one rating 
 
 ## Examples
 OKAY WHEW that was a hell of a read wasn't it? Hope you learned some shit. Now heres a few builds for you, can't promise they are all good, but just examples of possibilities. feel free to tweak them as you see fit to suit your needs or use what you learned here to build your ship your own way. If you have any questions, please ask.
-* https://eddp.co/u/MQLMstP7
-* https://eddp.co/u/Z9DCKNp6
-* https://eddp.co/u/oJQcodWT
-* https://eddp.co/u/rCiRBYvN
-* https://eddp.co/u/Cdio54wU
-* https://eddp.co/u/3qw4tkpE
-* https://eddp.co/u/DugRjXZu
+* <https://eddp.co/u/MQLMstP7>
+* <https://eddp.co/u/Z9DCKNp6>
+* <https://eddp.co/u/oJQcodWT>
+* <https://eddp.co/u/rCiRBYvN>
+* <https://eddp.co/u/Cdio54wU>
+* <https://eddp.co/u/3qw4tkpE>
+* <https://eddp.co/u/DugRjXZu>
 
 *[Original guide](https://www.reddit.com/r/eliteoutfitters/comments/74yzs0/fdl_setups_for_both_pvp_and_pve/) by [/u/HoochCow](https://www.reddit.com/user/HoochCow)*
