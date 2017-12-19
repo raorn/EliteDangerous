@@ -1,0 +1,44 @@
+PATH
+  remote: .
+  specs:
+    elite_dangerous (0.1.0)
+      gli
+      json
+      pg
+      pry
+      sequel
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    binding_of_caller (0.7.3)
+      debug_inspector (>= 0.0.1)
+    coderay (1.1.2)
+    debug_inspector (0.0.3)
+    gli (2.17.1)
+    interception (0.5)
+    json (2.1.0)
+    method_source (0.9.0)
+    pg (0.21.0)
+    pry (0.11.3)
+      coderay (~> 1.1.0)
+      method_source (~> 0.9.0)
+    pry-rescue (1.4.5)
+      interception (>= 0.5)
+      pry
+    pry-stack_explorer (0.4.9.2)
+      binding_of_caller (>= 0.7)
+      pry (>= 0.9.11)
+    sequel (5.3.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  bundler (~> 1.16)
+  elite_dangerous!
+  pry-rescue
+  pry-stack_explorer
+
+BUNDLED WITH
+   1.16.0

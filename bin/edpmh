@@ -1,0 +1,220 @@
+#!/usr/bin/env ruby
+
+require 'gli'
+require 'pry'
+require 'sequel'
+
+require 'elite_dangerous'
+
+include EliteDangerous::Utils
+include GLI::App
+
+program_desc 'Elite:Dangerous Passenger Mission Helper'
+
+version EliteDangerous::VERSION
+
+desc 'Database connection URI'
+default_value 'postgres:///ed'
+flag [:d, :'db-uri']
+
+pre do |global_opts, cmd, opts, args|
+  DB = Sequel.connect global_opts[:'db-uri']
+
+  if cmd.name == :init
+    EliteDangerous::Db.init
+  end
+
+  require 'elite_dangerous/models'
+  include EliteDangerous::Db::Models
+end
+
+desc 'Initialize database'
+command :init do |c|
+  c.action do |global_opts, opts, args|
+    # Nothing to do!
+  end
+end
+
+desc 'Import systems and stations data from jsonl files'
+arg :systems_jsonl
+arg :stations_jsonl
+command :import do |c|
+  c.action do |global_opts, opts, args|
+    systems_jsonl = args.shift
+    stations_jsonl = args.shift
+
+    each_json(systems_jsonl) do |row|
+      government = Government[row['government_id']] || Government.new(id: row['government_id'])
+      government.name = row['government']
+      government.save unless government.id.nil?
+
+      allegiance = Allegiance[row['allegiance_id']] || Allegiance.new(id: row['allegiance_id'])
+      allegiance.name = row['allegiance']
+      allegiance.save unless allegiance.id.nil?
+
+      state = State[row['state_id']] || State.new(id: row['state_id'])
+      state.name = row['state']
+      state.save unless state.id.nil?
+
+      security = Security[row['security_id']] || Security.new(id: row['security_id'])
+      security.name = row['security']
+      security.save unless security.id.nil?
+
+      primary_economy = PrimaryEconomy[row['primary_economy_id']] || PrimaryEconomy.new(id: row['primary_economy_id'])
+      primary_economy.name = row['primary_economy']
+      primary_economy.save unless primary_economy.id.nil?
+
+      system = System[row['id']] || System.new(id: row['id'])
+      system.name = row['name']
+      system.x = row['x']
+      system.y = row['y']
+      system.z = row['z']
+      system.population = row['population']
+      system.is_populated = row['is_populated']
+      system.government = government unless government.id.nil?
+      system.allegiance = allegiance unless allegiance.id.nil?
+      system.state = state unless state.id.nil?
+      system.security = security unless security.id.nil?
+      system.primary_economy = primary_economy unless primary_economy.id.nil?
+      system.needs_permit = row['needs_permit']
+      system.save unless system.id.nil?
+      $stdout.write "\e[2K#{row['name']}\r"
+      $stdout.flush
+    end
+    $stdout.write "\n"
+
+    each_json(stations_jsonl) do |row|
+      government = Government[row['government_id']] || Government.new(id: row['government_id'])
+      government.name = row['government']
+      government.save unless government.id.nil?
+
+      allegiance = Allegiance[row['allegiance_id']] || Allegiance.new(id: row['allegiance_id'])
+      allegiance.name = row['allegiance']
+      allegiance.save unless allegiance.id.nil?
+
+      state = State[row['state_id']] || State.new(id: row['state_id'])
+      state.name = row['state']
+      state.save unless state.id.nil?
+
+      station_type = StationType[row['type_id']] || StationType.new(id: row['type_id'])
+      station_type.name = row['type']
+      station_type.save unless station_type.id.nil?
+
+      system = System[row['system_id']]
+
+      station = Station[row['id']] || Station.new(id: row['id'])
+      station.name = row['name']
+      station.system = system unless system.nil?
+      station.distance_to_star = row['distance_to_star']
+      station.max_landing_pad_size = row['max_landing_pad_size']
+      station.government = government unless government.id.nil?
+      station.allegiance = allegiance unless allegiance.id.nil?
+      station.state = state unless state.id.nil?
+      station.station_type = station_type unless station_type.id.nil?
+      station.has_blackmarket = row['has_blackmarket']
+      station.has_market = row['has_market']
+      station.has_refuel = row['has_refuel']
+      station.has_repair = row['has_repair']
+      station.has_rearm = row['has_rearm']
+      station.has_outfitting = row['has_outfitting']
+      station.has_shipyard = row['has_shipyard']
+      station.has_docking = row['has_docking']
+      station.has_commodities = row['has_commodities']
+      station.is_planetary = row['is_planetary']
+      station.save unless station.id.nil?
+
+      $stdout.write "\e[2K#{row['name']}\r"
+      $stdout.flush
+    end
+    $stdout.write "\n"
+  end
+end
+
+desc 'Search system by name'
+arg :name
+command :system do |c|
+  c.action do |global_opts, opts, args|
+    name = args.shift
+    System.where(Sequel.ilike(:name, "#{name}%")).each do |s|
+      puts s.to_s
+    end
+  end
+end
+
+desc 'Search station by name'
+arg :name
+command :station do |c|
+  c.action do |global_opts, opts, args|
+    name = args.shift
+    Station.where(Sequel.ilike(:name, "#{name}%")).each do |s|
+      puts s.to_s
+    end
+  end
+end
+
+desc 'Search profitable pairs'
+command :search do |c|
+  c.flag [:m, :'max-jump'], default_value: 15,
+                            type: OptionParser::DecimalNumeric,
+                            desc: 'Maximum jump distance'
+  c.flag :'min-dist', default_value: 400_000,
+                      type: OptionParser::DecimalInteger,
+                      desc: 'Minimum distance to station'
+  c.flag :'max-dist', default_value: 1_000_000_000,
+                      type: OptionParser::DecimalInteger,
+                      desc: 'Maximum distance to station'
+  c.flag [:l, :'landing-pad'], default_value: 'L',
+                               desc: 'Biggest landing pad'
+  c.flag [:R, :'ref-system-id'], type: OptionParser::DecimalInteger,
+                                 desc: 'Reference system ID'
+  c.flag [:D, :'ref-system-dist'], type: OptionParser::DecimalNumeric,
+                                 desc: 'Max distance to reference system'
+  c.flag [:P, :'min-population'], type: OptionParser::DecimalInteger,
+                                  desc: 'Minimum source population'
+  c.action do |global_opts, opts, args|
+    targets = System.where(
+      id: System.distinct.select(:system_id).where{(distance_to_star <= opts[:'max-dist'])}.exclude{
+        {systems[:id] => Station.distinct.select(:system_id).where{(distance_to_star < opts[:'min-dist']) |
+                                                                   Sequel.lit('distance_to_star IS NULL')}}
+      }.join(:stations, system_id: :id).where(max_landing_pad_size: opts[:'landing-pad']))
+    ref = nil
+    unless opts[:'ref-system-id'] == nil
+      if opts[:'ref-system-dist'] == nil
+        help_now!('Must specify reference system distance along with reference system ID')
+      end
+      ref = System[opts[:'ref-system-id']]
+      exit_now!("System with ID #{opts[:'ref-system-id']} not found") if ref.nil?
+
+      targets = filter_dist(targets, ref, opts[:'ref-system-dist'])
+    end
+
+    pairs = []
+    targets.each do |t|
+      srcs = System.where{{systems[:id] => Station.distinct.select(:system_id).where(max_landing_pad_size: opts[:'landing-pad'])}}
+      srcs = filter_dist(srcs, t, opts[:'max-jump'])
+      srcs = srcs.where{population > opts[:'min-population']} unless opts[:'min-population'] == nil
+
+      srcs.each do |s|
+        next if t.id == s.id
+        pairs << [s, t]
+      end
+    end
+
+    pairs.sort!{|a, b| dist(a[1], ref) <=> dist(b[1], ref)} unless ref.nil?
+    pairs.each do |s, t|
+      puts "Pair found (#{dist(s, t)} Ly):"
+      puts s.to_s
+      puts t.to_s
+      puts
+    end
+  end
+end
+
+desc 'Open Ruby console (for hardcore users only)'
+command :shell do |c|
+  c.action do |global_opts, opts, args|
+    binding.pry
+  end
+end
+
+exit run(ARGV)
