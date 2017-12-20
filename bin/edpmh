@@ -171,12 +171,22 @@ command :search do |c|
                                  desc: 'Max distance to reference system'
   c.flag [:P, :'min-population'], type: OptionParser::DecimalInteger,
                                   desc: 'Minimum source population'
+  c.switch [:'2', :'two-way'], desc: 'Only search 2-way systems (source system selected from target list)'
   c.action do |global_opts, opts, args|
     targets = System.where(
-      id: System.distinct.select(:system_id).where{(distance_to_star <= opts[:'max-dist'])}.exclude{
-        {systems[:id] => Station.distinct.select(:system_id).where{(distance_to_star < opts[:'min-dist']) |
-                                                                   Sequel.lit('distance_to_star IS NULL')}}
-      }.join(:stations, system_id: :id).where(max_landing_pad_size: opts[:'landing-pad']))
+      id: System.distinct.select(:system_id).where{(distance_to_star <= opts[:'max-dist'])}
+            .exclude{
+              {systems[:id] => Station.distinct.select(:system_id)
+                                 .where{(distance_to_star < opts[:'min-dist']) |
+                                        Sequel.lit('distance_to_star IS NULL')}}}
+            .exclude{
+              {systems[:id] => Station.select(:system_id)
+                                 .where(is_planetary: false)
+                                 .where(max_landing_pad_size: opts[:'landing-pad'])
+                                 .group(:system_id)
+                                 .having{Sequel.lit('count(*) > 1')}}}
+                .join(:stations, system_id: :id).where(max_landing_pad_size: opts[:'landing-pad']))
+
     ref = nil
     unless opts[:'ref-system-id'] == nil
       if opts[:'ref-system-dist'] == nil
@@ -190,7 +200,7 @@ command :search do |c|
 
     pairs = []
     targets.each do |t|
-      srcs = System.where{{systems[:id] => Station.distinct.select(:system_id).where(max_landing_pad_size: opts[:'landing-pad'])}}
+      srcs = opts[:'two-way'] ? targets : System.where{{systems[:id] => Station.distinct.select(:system_id).where(max_landing_pad_size: opts[:'landing-pad'])}}
       srcs = filter_dist(srcs, t, opts[:'max-jump'])
       srcs = srcs.where{population > opts[:'min-population']} unless opts[:'min-population'] == nil
 

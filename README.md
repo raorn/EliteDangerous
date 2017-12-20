@@ -32,6 +32,7 @@ Advanced usage:
     # bundle exec bin/edpmh search --help
     ...
     COMMAND OPTIONS
+        -2, --[no-]two-way        - Only search 2-way systems (source system selected from target list)
         -D, --ref-system-dist=arg - Max distance to reference system (default: none)
         -P, --min-population=arg  - Minimum source population (default: none)
         -R, --ref-system-id=arg   - Reference system ID (default: none)
@@ -41,9 +42,9 @@ Advanced usage:
         --min-dist=arg            - Minimum distance to station (default: 400000)
 
 Search command have two stages.  First it finds all possible "targes" - systems
-that have stations closer than `max-dist` Ls, but not closer than `min-dist`
-Ls, have at least `landing-pad`-sized landing pad and otionally are not farther
-than `ref-system-dist` Lys from "reference system" `ref-system-id`.  Next, for
+that have non-planetary stations between `max-dist` and `min-dist` Ls, have at
+least `landing-pad`-sized landing pad and optionally are not farther than
+`ref-system-dist` Lys from "reference system" `ref-system-id`.  Next, for
 each "target" is searchs "sources" - systems that are no farther than
 `max-jump` Lys and optionally having `min-population` population.  And finally
 all found pairs are printed on standard output.
