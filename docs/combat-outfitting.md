@@ -210,7 +210,7 @@ Shoots down Missiles for you, and also shoots at incoming hatch breaker limpets 
 This is an activated utility that sends out a pulse around your ship with the range of the pulse getting bigger the longer you hold in the trigger for it. This basically sends a kill switch signal to missiles in its range.
 * **G5 Lightweight** is the only mod worth grabbing for this.
 
-###Specialty Scanners
+### Specialty Scanners
 * **Manifest Scanner**: YOU ARE A PIRATE! See whats in their hold
 * **Kill Warrant Scanner**: Find out if your target is wanted in other systems giving you more money per bounty kill!
 * **Frame Shift Wake Scanner**: YOU ARE A PIRATE... or ganker. If your target jumps away scan their wake to find out where they went and follow them. Honestly you'll only ever equip this when you gotta get wake data for engineers.
