@@ -39,6 +39,7 @@ Advanced usage:
         -l, --landing-pad=arg     - Biggest landing pad (default: L)
         -m, --max-jump=arg        - Maximum jump distance (default: 15)
         --max-dist=arg            - Maximum distance to station (default: 1000000000)
+        --max-sources=arg         - Maximum number of source systems per target (default: none)
         --min-dist=arg            - Minimum distance to station (default: 400000)
 
 Search command have two stages.  First it finds all possible "targes" - systems

@@ -171,6 +171,8 @@ command :search do |c|
                                  desc: 'Max distance to reference system'
   c.flag [:P, :'min-population'], type: OptionParser::DecimalInteger,
                                   desc: 'Minimum source population'
+  c.flag :'max-sources', type: OptionParser::DecimalInteger,
+                         desc: 'Maximum number of source systems per target'
   c.switch [:'2', :'two-way'], desc: 'Only search 2-way systems (source system selected from target list)'
   c.action do |global_opts, opts, args|
     targets = System.where(
@@ -204,18 +206,25 @@ command :search do |c|
       srcs = filter_dist(srcs, t, opts[:'max-jump'])
       srcs = srcs.where{population > opts[:'min-population']} unless opts[:'min-population'] == nil
 
+      _srcs = []
       srcs.each do |s|
         next if t.id == s.id
-        pairs << [s, t]
+        _srcs << s
       end
+      next if opts[:'max-sources'] and _srcs.length > opts[:'max-sources']
+      _srcs.sort!{|a, b| dist(a, t) <=> dist(b, t)}
+      pairs << [t, _srcs] unless _srcs.empty?
     end
 
-    pairs.sort!{|a, b| dist(a[1], ref) <=> dist(b[1], ref)} unless ref.nil?
-    pairs.each do |s, t|
-      puts "Pair found (#{dist(s, t)} Ly):"
-      puts s.to_s
-      puts t.to_s
-      puts
+    pairs.sort!{|a, b| dist(a[0], ref) <=> dist(b[0], ref)} unless ref.nil?
+    pairs.each do |t, _srcs|
+      _srcs.each do |s|
+        puts "Pair found (#{dist(s, t)} Ly):"
+        puts s.to_s
+        puts t.to_s
+        puts
+      end
+      puts "---"
     end
   end
 end
