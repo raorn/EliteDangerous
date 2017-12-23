@@ -15,6 +15,10 @@ module EliteDangerous
         one_to_many :stations
       end
 
+      class PowerState < Sequel::Model
+        one_to_many :systems
+      end
+
       class State < Sequel::Model
         one_to_many :systems
         one_to_many :stations
@@ -35,13 +39,23 @@ module EliteDangerous
       class System < Sequel::Model
         many_to_one :government
         many_to_one :allegiance
+        many_to_one :power_state
         many_to_one :state
         many_to_one :security
         many_to_one :primary_economy
         one_to_many :stations
 
-        def to_s
-          "id: #{id}, name: #{name}, stations: #{stations.sort{|a,b| (a.distance_to_star || 0) <=> (b.distance_to_star || 0)}.map{|s| "#{s.name} (#{s.distance_to_star || "???"} Ls)"}.join(", ")}"
+        def format(ident: 0, ref: nil)
+          pfx = '  ' * ident
+          str = ''
+          str << pfx << "System: #{name} (#{id})#{", #{dist(self, ref)} Ly" unless ref.nil?}\n"
+          str << pfx << "  Allegiance: #{allegiance.name} (#{government.name})\n"
+          str << pfx << "  Power: #{power} (#{power_state.name})\n" unless power.nil?
+          str << pfx << "  Primary Economy: #{primary_economy.name}\n" unless primary_economy.nil?
+          stations.sort{|a,b| (a.distance_to_star || 1_000_000_000) <=> (b.distance_to_star || 1_000_000_000)}.each do |s|
+            str << s.format(ident: ident+1, include_system: false)
+          end
+          str
         end
       end
 
@@ -52,8 +66,14 @@ module EliteDangerous
         many_to_one :station_type
         many_to_one :system
 
-        def to_s
-          "id: #{id}, name: #{name} (#{distance_to_star || "???"} Ls), system: #{system.name} (#{system_id})"
+        def format(ident: 0, include_system: true)
+          pfx = '  ' * ident
+          str = ''
+          str << pfx << "Station: #{name} (#{id}), #{distance_to_star || "???"} Ls\n"
+          str << pfx << "  Type: #{station_type&.name || "???"}\n"
+          str << pfx << "  Landing Pad: #{max_landing_pad_size || "???"}\n"
+          str << pfx << "  System: #{system.name} (#{system_id})\n" if include_system
+          str
         end
       end
     end

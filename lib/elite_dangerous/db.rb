@@ -6,6 +6,7 @@ module EliteDangerous
       [:governments,
        :allegiances,
        :states,
+       :power_states,
        :securities,
        :primary_economies,
        :station_types,
@@ -28,6 +29,7 @@ module EliteDangerous
         column :needs_permit, TrueClass
         foreign_key :government_id, :governments
         foreign_key :allegiance_id, :allegiances
+        foreign_key :power_state_id, :power_states
         foreign_key :state_id, :states
         foreign_key :security_id, :securities
         foreign_key :primary_economy_id, :primary_economies

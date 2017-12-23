@@ -52,6 +52,10 @@ command :import do |c|
       allegiance.name = row['allegiance']
       allegiance.save unless allegiance.id.nil?
 
+      power_state = PowerState[row['power_state_id']] || PowerState.new(id: row['power_state_id'])
+      power_state.name = row['power_state']
+      power_state.save unless power_state.id.nil?
+
       state = State[row['state_id']] || State.new(id: row['state_id'])
       state.name = row['state']
       state.save unless state.id.nil?
@@ -69,10 +73,12 @@ command :import do |c|
       system.x = row['x']
       system.y = row['y']
       system.z = row['z']
+      system.power = row['power']
       system.population = row['population']
       system.is_populated = row['is_populated']
       system.government = government unless government.id.nil?
       system.allegiance = allegiance unless allegiance.id.nil?
+      system.power_state = power_state unless power_state.id.nil?
       system.state = state unless state.id.nil?
       system.security = security unless security.id.nil?
       system.primary_economy = primary_economy unless primary_economy.id.nil?
@@ -135,9 +141,7 @@ arg :name
 command :system do |c|
   c.action do |global_opts, opts, args|
     name = args.shift
-    System.where(Sequel.ilike(:name, "#{name}%")).each do |s|
-      puts s.to_s
-    end
+    puts System.where(Sequel.ilike(:name, "#{name}%")).map(&:format).join("\n")
   end
 end
 
@@ -146,9 +150,7 @@ arg :name
 command :station do |c|
   c.action do |global_opts, opts, args|
     name = args.shift
-    Station.where(Sequel.ilike(:name, "#{name}%")).each do |s|
-      puts s.to_s
-    end
+    puts Station.where(Sequel.ilike(:name, "#{name}%")).map(&:format).join("\n")
   end
 end
 
@@ -216,15 +218,20 @@ command :search do |c|
       pairs << [t, _srcs] unless _srcs.empty?
     end
 
-    pairs.sort!{|a, b| dist(a[0], ref) <=> dist(b[0], ref)} unless ref.nil?
+    if ref.nil?
+      pairs.sort!{|a, b| a[1].length <=> b[1].length}
+    else
+      pairs.sort!{|a, b| dist(a[0], ref) <=> dist(b[0], ref)}
+    end
+    puts "#{pairs.length} possible targets found:"
     pairs.each do |t, _srcs|
+      puts
+      puts "[ #{_srcs.length} ]"
+      puts t.format
+      puts
       _srcs.each do |s|
-        puts "Pair found (#{dist(s, t)} Ly):"
-        puts s.to_s
-        puts t.to_s
-        puts
+        puts s.format(ident: 1, ref: t)
       end
-      puts "---"
     end
   end
 end
