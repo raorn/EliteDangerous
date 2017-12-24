@@ -48,7 +48,7 @@ module EliteDangerous
         def format(ident: 0, ref: nil)
           pfx = '  ' * ident
           str = ''
-          str << pfx << "System: #{name} (#{id})#{", #{dist(self, ref)} Ly" unless ref.nil?}\n"
+          str << pfx << "System: #{name} (#{id})#{", #{dist(self, ref)} Ly" unless ref.nil?}#{" [PERMIT REQUIRED]" if needs_permit}\n"
           str << pfx << "  Allegiance: #{allegiance.name} (#{government.name})\n"
           str << pfx << "  Power: #{power} (#{power_state.name})\n" unless power.nil?
           str << pfx << "  Primary Economy: #{primary_economy.name}\n" unless primary_economy.nil?
@@ -72,7 +72,7 @@ module EliteDangerous
           str << pfx << "Station: #{name} (#{id}), #{distance_to_star || "???"} Ls\n"
           str << pfx << "  Type: #{station_type&.name || "???"}\n"
           str << pfx << "  Landing Pad: #{max_landing_pad_size || "???"}\n"
-          str << pfx << "  System: #{system.name} (#{system_id})\n" if include_system
+          str << pfx << "  System: #{system.name} (#{system_id})#{" [PERMIT REQUIRED]" if system.needs_permit}\n" if include_system
           str
         end
       end
