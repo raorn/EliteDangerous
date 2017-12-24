@@ -189,7 +189,8 @@ command :search do |c|
                                  .where(max_landing_pad_size: opts[:'landing-pad'])
                                  .group(:system_id)
                                  .having{Sequel.lit('count(*) > 1')}}}
-                .join(:stations, system_id: :id).where(max_landing_pad_size: opts[:'landing-pad']))
+                .join(:stations, system_id: :id).where(max_landing_pad_size: opts[:'landing-pad'])
+                                                .where(is_planetary: false))
 
     ref = nil
     unless opts[:'ref-system-id'] == nil
