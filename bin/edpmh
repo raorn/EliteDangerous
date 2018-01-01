@@ -140,7 +140,7 @@ desc 'Search system by name'
 arg :name
 command :system do |c|
   c.action do |global_opts, opts, args|
-    name = args.shift
+    name = args.join(' ')
     puts System.where(Sequel.ilike(:name, "#{name}%")).map(&:format).join("\n")
   end
 end
@@ -149,7 +149,7 @@ desc 'Search station by name'
 arg :name
 command :station do |c|
   c.action do |global_opts, opts, args|
-    name = args.shift
+    name = args.join(' ')
     puts Station.where(Sequel.ilike(:name, "#{name}%")).map(&:format).join("\n")
   end
 end
