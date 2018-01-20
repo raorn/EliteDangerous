@@ -165,8 +165,6 @@ command :search do |c|
   c.flag :'max-dist', default_value: 1_000_000_000,
                       type: OptionParser::DecimalInteger,
                       desc: 'Maximum distance to station'
-  c.flag [:l, :'landing-pad'], default_value: 'L',
-                               desc: 'Biggest landing pad'
   c.flag [:R, :'ref-system-id'], type: OptionParser::DecimalInteger,
                                  desc: 'Reference system ID'
   c.flag [:D, :'ref-system-dist'], type: OptionParser::DecimalNumeric,
@@ -176,21 +174,34 @@ command :search do |c|
   c.flag :'max-sources', type: OptionParser::DecimalInteger,
                          desc: 'Maximum number of source systems per target'
   c.switch [:'2', :'two-way'], desc: 'Only search 2-way systems (source system selected from target list)'
+  c.switch [:'ignore-planetary'], default_value: true,
+                                  desc: 'Ignore planetary destinations'
+  c.switch [:'medium-pad'], desc: 'Allow medium pad for source'
+
   c.action do |global_opts, opts, args|
-    targets = System.where(
-      id: System.distinct.select(:system_id).where{(distance_to_star <= opts[:'max-dist'])}
-            .exclude{
-              {systems[:id] => Station.distinct.select(:system_id)
-                                 .where{(distance_to_star < opts[:'min-dist']) |
-                                        Sequel.lit('distance_to_star IS NULL')}}}
-            .exclude{
-              {systems[:id] => Station.select(:system_id)
-                                 .where(is_planetary: false)
-                                 .where(max_landing_pad_size: opts[:'landing-pad'])
-                                 .group(:system_id)
-                                 .having{Sequel.lit('count(*) > 1')}}}
-                .join(:stations, system_id: :id).where(max_landing_pad_size: opts[:'landing-pad'])
-                                                .where(is_planetary: false))
+
+    base_stations = Station.select(:system_id)
+                      .where(max_landing_pad_size: 'L')
+    if opts[:'ignore-planetary']
+      base_stations = base_stations.where(is_planetary: false)
+    end
+
+    too_close = base_stations
+                  .distinct
+                  .where{((distance_to_star) < opts[:'min-dist']) |
+                         {distance_to_star: nil}}
+
+    too_many = base_stations
+                 .group(:system_id)
+                 .having{count.function.* > 1}
+
+    acceptable = base_stations
+                   .distinct
+                   .where{(distance_to_star <= opts[:'max-dist'])}
+                   .exclude(system_id: too_close)
+                   .exclude(system_id: too_many)
+
+    targets = System.where(id: acceptable)
 
     ref = nil
     unless opts[:'ref-system-id'] == nil
@@ -205,7 +216,15 @@ command :search do |c|
 
     pairs = []
     targets.each do |t|
-      srcs = opts[:'two-way'] ? targets : System.where{{systems[:id] => Station.distinct.select(:system_id).where(max_landing_pad_size: opts[:'landing-pad'])}}
+      srcs = if opts[:'two-way']
+               targets
+             else
+               System.where(id: Station
+                                  .distinct
+                                  .select(:system_id)
+                                  .exclude(max_landing_pad_size: nil)
+                                  .where(max_landing_pad_size: (opts[:'medium-pad'] ? ['L', 'M'] : 'L')))
+             end
       srcs = filter_dist(srcs, t, opts[:'max-jump'])
       srcs = srcs.where{population > opts[:'min-population']} unless opts[:'min-population'] == nil
 

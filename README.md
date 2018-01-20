@@ -36,19 +36,20 @@ Advanced usage:
         -D, --ref-system-dist=arg - Max distance to reference system (default: none)
         -P, --min-population=arg  - Minimum source population (default: none)
         -R, --ref-system-id=arg   - Reference system ID (default: none)
-        -l, --landing-pad=arg     - Biggest landing pad (default: L)
+        --[no-]ignore-planetary   - Ignore planetary destinations (default: enabled)
         -m, --max-jump=arg        - Maximum jump distance (default: 15)
         --max-dist=arg            - Maximum distance to station (default: 1000000000)
         --max-sources=arg         - Maximum number of source systems per target (default: none)
+        --[no-]medium-pad         - Allow medium pad for source
         --min-dist=arg            - Minimum distance to station (default: 400000)
 
 Search command have two stages.  First it finds all possible "targes" - systems
-that have non-planetary stations between `max-dist` and `min-dist` Ls, have at
-least `landing-pad`-sized landing pad and optionally are not farther than
+that have exactly one [non-planetary] station between `max-dist` and `min-dist` Ls
+with at least L-sized landing pad and optionally are not farther than
 `ref-system-dist` Lys from "reference system" `ref-system-id`.  Next, for
 each "target" is searchs "sources" - systems that are no farther than
-`max-jump` Lys and optionally having `min-population` population.  And finally
-all found pairs are printed on standard output.
+`max-jump` Lys and optionally having `min-population` population.
+All found pairs are printed on standard output.
 
 Not all information from EDDB data is imported. Not all imported information is
 displayed of used in searches, so if you have anythng to add - patches are welcome.
