@@ -49,7 +49,7 @@ module EliteDangerous
           pfx = '  ' * ident
           str = ''
           str << pfx << "System: #{name} (#{id})#{", #{dist(self, ref)} Ly" unless ref.nil?}#{" [PERMIT REQUIRED]" if needs_permit}\n"
-          str << pfx << "  Allegiance: #{allegiance.name} (#{government.name})\n"
+          str << pfx << "  Allegiance: #{allegiance.name} (#{government.name})\n" unless allegiance.nil? or government.nil?
           str << pfx << "  Power: #{power} (#{power_state.name})\n" unless power.nil?
           str << pfx << "  Primary Economy: #{primary_economy.name}\n" unless primary_economy.nil?
           stations.sort{|a,b| (a.distance_to_star || 1_000_000_000) <=> (b.distance_to_star || 1_000_000_000)}.each do |s|
