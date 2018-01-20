@@ -39,9 +39,11 @@ Advanced usage:
         --[no-]ignore-planetary   - Ignore planetary destinations (default: enabled)
         -m, --max-jump=arg        - Maximum jump distance (default: 15)
         --max-dist=arg            - Maximum distance to station (default: 1000000000)
+        --max-pool-size=arg       - Maximum size of source systems pool (default: none)
         --max-sources=arg         - Maximum number of source systems per target (default: none)
         --[no-]medium-pad         - Allow medium pad for source
         --min-dist=arg            - Minimum distance to station (default: 400000)
+        -s, --sort=arg            - Source systems sorting method [dist, pool, factions] (default: dist)
 
 Search command have two stages.  First it finds all possible "targes" - systems
 that have exactly one [non-planetary] station between `max-dist` and `min-dist` Ls

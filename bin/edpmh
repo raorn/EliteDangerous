@@ -174,6 +174,11 @@ command :search do |c|
                                   desc: 'Minimum source population'
   c.flag :'max-sources', type: OptionParser::DecimalInteger,
                          desc: 'Maximum number of source systems per target'
+  c.flag :'max-pool-size', type: OptionParser::DecimalInteger,
+                           desc: 'Maximum size of source systems pool'
+  c.flag [:s, :sort], must_match: ['dist', 'pool', 'factions'],
+                      default_value: 'dist',
+                      desc: 'Source systems sorting method [dist, pool, factions]'
   c.switch [:'2', :'two-way'], desc: 'Only search 2-way systems (source system selected from target list)'
   c.switch [:'ignore-planetary'], default_value: true,
                                   desc: 'Ignore planetary destinations'
@@ -234,10 +239,29 @@ command :search do |c|
         next if t.id == s.id
         pool = System.where{population > 0}
         pool = filter_dist(pool, s, opts[:'max-jump'])
-        _srcs << [s, pool.count - 1]
+        pool_size = pool.count - 1
+        next if opts[:'max-pool-size'] != nil and pool_size > opts[:'max-pool-size']
+        _srcs << [s, pool_size]
       end
       next if opts[:'max-sources'] and _srcs.length > opts[:'max-sources']
-      _srcs.sort!{|a, b| dist(a[0], t) <=> dist(b[0], t)}
+      _srcs.sort! do |a, b|
+        case opts[:sort]
+        when 'dist'
+          dist(a[0], t) <=> dist(b[0], t)
+        when 'pool'
+          if a[1] == b[1]
+            b[0].minor_faction_count <=> a[0].minor_faction_count
+          else
+            a[1] <=> b[1]
+          end
+        when 'factions'
+          if b[0].minor_faction_count == a[0].minor_faction_count
+            a[1] <=> b[1]
+          else
+            b[0].minor_faction_count <=> a[0].minor_faction_count
+          end
+        end
+      end
       pairs << [t, _srcs] unless _srcs.empty?
     end
 
