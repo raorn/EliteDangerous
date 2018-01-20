@@ -27,6 +27,7 @@ module EliteDangerous
         column :is_populated, TrueClass
         column :power, String
         column :needs_permit, TrueClass
+        column :minor_faction_count, Integer
         foreign_key :government_id, :governments
         foreign_key :allegiance_id, :allegiances
         foreign_key :power_state_id, :power_states
