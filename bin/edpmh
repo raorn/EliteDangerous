@@ -232,9 +232,9 @@ command :search do |c|
       _srcs = []
       srcs.each do |s|
         next if t.id == s.id
-        pool = System.where{{systems[:id] => Station.distinct.select(:system_id).where(max_landing_pad_size: opts[:'landing-pad'])}}
+        pool = System.where{population > 0}
         pool = filter_dist(pool, s, opts[:'max-jump'])
-        _srcs << [s, (pool.count - 1)]
+        _srcs << [s, pool.count - 1]
       end
       next if opts[:'max-sources'] and _srcs.length > opts[:'max-sources']
       _srcs.sort!{|a, b| dist(a[0], t) <=> dist(b[0], t)}
@@ -249,13 +249,12 @@ command :search do |c|
     puts "#{pairs.length} possible targets found:"
     pairs.each do |t, _srcs|
       puts
-      puts "[ #{_srcs.length} sources within #{opts[:'max-jump']} Ly of the Destination ]"
-      puts
-      puts "Destination #{t.format}"
+      puts "[ #{_srcs.length} source systems within #{opts[:'max-jump']} Ly ]"
+      puts t.format
       puts
       _srcs.each do |s|
-        puts "       [ Source pool: #{s[1]} systems within #{opts[:'max-jump']} Ly radius having landing pad size: #{opts[:'landing-pad']} ]"
-        puts s[0].format(ident: 5, ref: t)
+        puts "    [ Source pool: #{s[1]} systems within #{opts[:'max-jump']} Ly radius ]"
+        puts s[0].format(ident: 2, ref: t)
         puts
       end
     end
