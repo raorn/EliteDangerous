@@ -239,7 +239,7 @@ command :search do |c|
         pool = System.where(id: Station
                                   .distinct
                                   .select(:system_id)
-                                  .with_landing_pad)
+                                  .with_landing_pad(allow_medium: opts[:'medium-pad']))
                  .around_system(s, opts[:'max-jump'])
         pool_size = pool.count - 1
         next if opts[:'max-pool-size'] != nil and pool_size > opts[:'max-pool-size']
