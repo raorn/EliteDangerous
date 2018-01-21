@@ -187,7 +187,7 @@ command :search do |c|
   c.action do |global_opts, opts, args|
 
     base_stations = Station.select(:system_id)
-                      .where(max_landing_pad_size: 'L')
+                      .with_landing_pad
     if opts[:'ignore-planetary']
       base_stations = base_stations.where(is_planetary: false)
     end
@@ -217,7 +217,7 @@ command :search do |c|
       ref = System[opts[:'ref-system-id']]
       exit_now!("System with ID #{opts[:'ref-system-id']} not found") if ref.nil?
 
-      targets = filter_dist(targets, ref, opts[:'ref-system-dist'])
+      targets = targets.around_system(ref, opts[:'ref-system-dist'])
     end
 
     pairs = []
@@ -228,17 +228,19 @@ command :search do |c|
                System.where(id: Station
                                   .distinct
                                   .select(:system_id)
-                                  .exclude(max_landing_pad_size: nil)
-                                  .where(max_landing_pad_size: (opts[:'medium-pad'] ? ['L', 'M'] : 'L')))
+                                  .with_landing_pad(allow_medium: opts[:'medium-pad']))
              end
-      srcs = filter_dist(srcs, t, opts[:'max-jump'])
+               .around_system(t, opts[:'max-jump'])
       srcs = srcs.where{population > opts[:'min-population']} unless opts[:'min-population'] == nil
 
       _srcs = []
       srcs.each do |s|
         next if t.id == s.id
-        pool = System.where{population > 0}
-        pool = filter_dist(pool, s, opts[:'max-jump'])
+        pool = System.where(id: Station
+                                  .distinct
+                                  .select(:system_id)
+                                  .with_landing_pad)
+                 .around_system(s, opts[:'max-jump'])
         pool_size = pool.count - 1
         next if opts[:'max-pool-size'] != nil and pool_size > opts[:'max-pool-size']
         _srcs << [s, pool_size]

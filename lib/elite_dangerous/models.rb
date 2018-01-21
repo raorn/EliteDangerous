@@ -58,6 +58,12 @@ module EliteDangerous
           end
           str
         end
+
+        dataset_module do
+          def around_system(tgt, max_dist)
+            where(Sequel.lit('|/((x-(?))^2+(y-(?))^2+(z-(?))^2) < ?', tgt.x, tgt.y, tgt.z, max_dist))
+          end
+        end
       end
 
       class Station < Sequel::Model
@@ -75,6 +81,12 @@ module EliteDangerous
           str << pfx << "  Landing Pad: #{max_landing_pad_size || "???"}\n"
           str << pfx << "  System: #{system.name} (#{system_id})#{" [PERMIT REQUIRED]" if system.needs_permit}\n" if include_system
           str
+        end
+
+        dataset_module do
+          def with_landing_pad(allow_medium: false)
+            where(max_landing_pad_size: (allow_medium ? ['L', 'M'] : 'L'))
+          end
         end
       end
     end
