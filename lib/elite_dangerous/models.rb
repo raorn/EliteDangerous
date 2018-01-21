@@ -55,7 +55,7 @@ module EliteDangerous
           str << pfx << "  Power: #{power} (#{power_state.name})\n" unless power.nil?
           str << pfx << "  Primary Economy: #{primary_economy.name}\n" unless primary_economy.nil?
           stations.sort{|a,b| (a.distance_to_star || 1_000_000_000) <=> (b.distance_to_star || 1_000_000_000)}.each do |s|
-            str << s.format(ident: ident+1, include_system: false)
+            str << s.format(ident: ident+1, include_system: false) if ['L', 'M'].include?(s.max_landing_pad_size)
           end
           str
         end
