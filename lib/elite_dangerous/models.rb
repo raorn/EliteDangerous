@@ -45,9 +45,10 @@ module EliteDangerous
         many_to_one :primary_economy
         one_to_many :stations
 
-        def format(ident: 0, ref: nil)
+        def format(ident: 0, ref: nil, header: nil)
           pfx = '  ' * ident
           str = ''
+          str << pfx << "[ " << header << " ]\n" unless header.nil?
           str << pfx << "System: #{name} (#{id})#{", #{dist(self, ref)} Ly" unless ref.nil?}#{" [PERMIT REQUIRED]" if needs_permit}\n"
           str << pfx << "  Minor Factions: #{minor_faction_count}\n"
           str << pfx << "  Allegiance: #{allegiance.name} (#{government.name})\n" unless allegiance.nil? or government.nil?
@@ -73,9 +74,10 @@ module EliteDangerous
         many_to_one :station_type
         many_to_one :system
 
-        def format(ident: 0, include_system: true)
+        def format(ident: 0, include_system: true, header: nil)
           pfx = '  ' * ident
           str = ''
+          str << pfx << "[ " << header << " ]\n" unless header.nil?
           str << pfx << "Station: #{name} (#{id}), #{distance_to_star || "???"} Ls\n"
           str << pfx << "  Type: #{station_type&.name || "???"}\n"
           str << pfx << "  Landing Pad: #{max_landing_pad_size || "???"}\n"

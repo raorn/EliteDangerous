@@ -275,12 +275,10 @@ command :search do |c|
     puts "#{pairs.length} possible targets found:"
     pairs.each do |t, _srcs|
       puts
-      puts "[ #{_srcs.length} source systems within #{opts[:'max-jump']} Ly ]"
-      puts t.format
+      puts t.format(header: "#{_srcs.length} source systems within #{opts[:'max-jump']} Ly")
       puts
       _srcs.each do |s|
-        puts "    [ Source pool: #{s[1]} systems within #{opts[:'max-jump']} Ly radius ]"
-        puts s[0].format(ident: 2, ref: t)
+        puts s[0].format(ident: 2, ref: t, header: "Source pool: #{s[1]} systems within #{opts[:'max-jump']} Ly radius")
         puts
       end
     end
