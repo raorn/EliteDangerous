@@ -214,7 +214,9 @@ This is an activated utility that sends out a pulse around your ship with the ra
 * **Manifest Scanner**: YOU ARE A PIRATE! See whats in their hold
 * **Kill Warrant Scanner**: Find out if your target is wanted in other systems giving you more money per bounty kill!
 * **Frame Shift Wake Scanner**: YOU ARE A PIRATE... or ganker. If your target jumps away scan their wake to find out where they went and follow them. Honestly you'll only ever equip this when you gotta get wake data for engineers.
+
 You either want to **D** rate these and then slowly raise them up by one rating until you **A** rate them or run out of power for them should you use them... with the exception of the wake scanner, always **D** rate that shit. The higher their rating the more power they use but also the farther away you can scan from.
+
 * **G5 Fast Scan**: Reduces your scan range, but makes the scans REALLY fast. (Recommended for Manifest Scanner, only for Kill Warrant if you can get it up to at bare minimum a C rating)
 * **G5 Long Range**: Doesn't change scan time, but lets you scan from farther away, (Use this for Wake Scanner and Kill Warrant Scanners you can't get to a C or B rating)
 
